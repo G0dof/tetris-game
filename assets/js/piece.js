@@ -36,6 +36,8 @@ class Piece {
         this.fill(defaultColor);
     } // Undraw the piece
 
+
+
     moveDown() {
         if (!this.collision(0, 1, this.activePiece)) {
             this.unDraw();
@@ -47,6 +49,46 @@ class Piece {
         this.lock();
         piece = randomPiece();
     } // Move the piece down
+
+    moveLeft() {
+        if (!this.collision(-1, 1, this.activePiece)) {
+            this.unDraw();
+            this.x--;
+            this.draw();
+            return;
+        }
+    }
+
+    moveRight() {
+        if (!this.collision(1, 1, this.activePiece)) {
+            this.unDraw();
+            this.x++;
+            this.draw();
+            return;
+
+        }
+    }
+
+    rotate() {
+        let nextPattern = this.piece[(this.pieceN + 1) % this.piece.length];
+        let kick = 0;
+
+        if (this.collision(0, 0, nextPattern)) {
+            kick = 1;
+
+            if (this.x > COL / 2) {
+                kick = -1;
+            }
+        }
+
+        if (!this.collision(kick, 0, nextPattern)) {
+            this.unDraw();
+            this.x += kick;
+            this.pieceN = (this.pieceN + 1) % this.piece.length;
+            this.activePiece = this.piece[this.pieceN];
+            this.draw();
+        }
+    }
 
     collision(x, y, futurePiece) {
         for (
@@ -103,6 +145,18 @@ class Piece {
                 }
 
                 board[this.y + currentRow][this.x + currentCol] = this.color;
+            }
+        }
+        for (let currentRow = 0; currentRow < ROW; currentRow++) {
+            let isRowFull = true;
+
+            for (let currentCol = 0; currentCol < COL; currentCol++) {
+                const currentSquareColor = board[currentRow][currentCol];
+                isRowFull = isRowFull && (currentSquareColor != defaultColor);
+            }
+
+            if (isRowFull) {
+                updateRowAndScore(currentRow);
             }
         }
         drawBoard();

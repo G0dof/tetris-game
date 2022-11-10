@@ -5,6 +5,9 @@ function drawBoard() {
             drawSquare(currentCol, currentRow, currentSquareColor);
         }
     }
+    
+    scoreElement.innerHTML = score;
+    speedElement.innerHTML = speed;
 } // Draw the board
 
 function drawSquare(x, y, color) {
@@ -36,4 +39,52 @@ function drop() {
     }
 
     requestAnimationFrame(drop);
+}
+
+function CONTROL(event) {
+    const moveFunctions = {
+        ArrowLeft() {
+            piece.moveLeft();
+            dropStart = Date.now();
+        },
+        ArrowRight() {
+            piece.moveRight();
+            dropStart = Date.now();
+        },
+        ArrowUp() {
+            piece.rotate();
+            dropStart = Date.now();
+        },
+        ArrowDown() {
+            piece.moveDown();
+        }
+    }
+
+    const movePiece = moveFunctions[event.code];
+    movePiece()
+}
+
+function updateRowAndScore() {
+    for (let currentRow = 0; currentRow < ROW; currentRow++) {
+        let isRowFull = true;
+
+        for (let currentCol = 0; currentCol < COL; currentCol++) {
+            isRowFull = isRowFull && board[currentRow][currentCol] !== defaultColor;
+        }
+
+        if (isRowFull) {
+            for (let currentRow2 = currentRow; currentRow2 > 1; currentRow2--) {
+                for (let currentCol = 0; currentCol < COL; currentCol++) {
+                    board[currentRow2][currentCol] = board[currentRow2 - 1][currentCol];
+                }
+            }
+
+            for (let currentCol = 0; currentCol < COL; currentCol++) {
+                board[0][currentCol] = defaultColor;
+            }
+
+            score += 10;
+            speed -= 10;
+        }
+    }
 }
